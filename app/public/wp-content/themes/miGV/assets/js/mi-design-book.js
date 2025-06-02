@@ -65,6 +65,7 @@
     // Initialize on document ready
     $(document).ready(function() {
         initializeEventHandlers();
+        loadCardTypes();
         updatePreview();
         updateCode();
     });
@@ -708,6 +709,179 @@
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
+    }
+
+    // Toggle custom type input
+    $('#toggle-custom-type').on('click', function() {
+        const isCustom = $('#custom-type-name').is(':visible');
+        $('#custom-type-name').toggle(!isCustom);
+        $('#card-type').toggle(isCustom);
+        $(this).text(isCustom ? 'Custom' : 'Cancel');
+    });
+
+    // Save as type
+    $('#save-as-type').on('click', function() {
+        $('#save-type-form').slideToggle();
+        // Pre-fill with current type if custom
+        if ($('#custom-type-name').is(':visible')) {
+            $('#save-type-name').val($('#custom-type-name').val());
+        }
+    });
+
+    $('#cancel-save-type').on('click', function() {
+        $('#save-type-form').slideUp();
+    });
+
+    $('#confirm-save-type').on('click', function() {
+        const typeName = $('#save-type-name').val().trim();
+        const description = $('#save-type-description').val().trim();
+        
+        if (!typeName) {
+            alert('Please enter a type name');
+            return;
+        }
+        
+        // Prepare configuration
+        const configuration = {
+            variant: cardState.variant,
+            badges: cardState.badges,
+            meta: cardState.meta,
+            actions: cardState.actions,
+            cornerStyle: cardState.cornerStyle,
+            showShadow: cardState.showShadow,
+            showHover: cardState.showHover,
+            // Store field mappings if in dynamic mode
+            fieldMappings: $('input[name="data-source"]:checked').val() === 'dynamic' ? {
+                postType: $('#dynamic-post-selector').find(':selected').data('type'),
+                pretitle: cardState.pretitle,
+                subtitle: cardState.subtitle
+            } : null
+        };
+        
+        // Save via AJAX
+        $.ajax({
+            url: miDesignBook.ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'mi_save_card_type',
+                nonce: miDesignBook.nonce,
+                type_name: typeName.toLowerCase().replace(/\s+/g, '-'),
+                display_name: typeName,
+                description: description,
+                configuration: JSON.stringify(configuration)
+            },
+            success: function(response) {
+                if (response.success) {
+                    alert('Card type saved successfully!');
+                    $('#save-type-form').slideUp();
+                    $('#save-type-name').val('');
+                    $('#save-type-description').val('');
+                    loadCardTypes(); // Reload the types dropdown
+                } else {
+                    alert('Error saving card type: ' + response.data);
+                }
+            },
+            error: function() {
+                alert('Error saving card type');
+            }
+        });
+    });
+
+    // Load saved type
+    $('#saved-types').on('change', function() {
+        const selectedType = $(this).val();
+        if (selectedType) {
+            loadSavedType(selectedType);
+        }
+    });
+
+    // Load card types from database
+    function loadCardTypes() {
+        $.ajax({
+            url: miDesignBook.ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'mi_get_card_types',
+                nonce: miDesignBook.nonce
+            },
+            success: function(response) {
+                if (response.success) {
+                    const customGroup = $('#custom-types-group');
+                    customGroup.empty();
+                    
+                    // Add custom types to dropdown
+                    for (const [key, type] of Object.entries(response.data.custom)) {
+                        customGroup.append(`
+                            <option value="${key}">${type.name} - ${type.description}</option>
+                        `);
+                    }
+                    
+                    // Store types for later use
+                    window.savedCardTypes = {
+                        ...response.data.built_in,
+                        ...response.data.custom
+                    };
+                }
+            }
+        });
+    }
+
+    // Load a saved type configuration
+    function loadSavedType(typeName) {
+        const typeConfig = window.savedCardTypes[typeName];
+        if (!typeConfig) {
+            alert('Type not found');
+            return;
+        }
+        
+        // Apply configuration
+        const config = typeConfig.configuration;
+        
+        // Set variant
+        if (config.variant) {
+            $('#card-variant').val(config.variant);
+            cardState.variant = config.variant;
+        }
+        
+        // Set badges
+        if (config.badges) {
+            cardState.badges = config.badges;
+            updateBadgesList();
+        }
+        
+        // Set meta
+        if (config.meta) {
+            cardState.meta = config.meta;
+        }
+        
+        // Set actions
+        if (config.actions) {
+            cardState.actions = config.actions;
+            updateActionsList();
+        }
+        
+        // Set style options
+        if (config.cornerStyle) {
+            $('#corner-style').val(config.cornerStyle);
+            cardState.cornerStyle = config.cornerStyle;
+        }
+        
+        $('#show-shadow').prop('checked', config.showShadow !== false);
+        $('#show-hover').prop('checked', config.showHover !== false);
+        cardState.showShadow = config.showShadow !== false;
+        cardState.showHover = config.showHover !== false;
+        
+        // Update preview
+        updatePreview();
+        updateCode();
+        
+        // Show success message
+        const $select = $('#saved-types');
+        const originalText = $select.find('option:selected').text();
+        $select.find('option:selected').text(originalText + ' ✓');
+        setTimeout(() => {
+            $select.find('option:selected').text(originalText);
+        }, 2000);
     }
 
 })(jQuery);

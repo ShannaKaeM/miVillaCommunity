@@ -59,10 +59,29 @@
             {# Card Type Selection #}
             <div class="control-group">
                 <label>Card Type</label>
-                <select id="card-type" class="form-control">
-                    {% for key, type in component_types %}
-                        <option value="{{ key }}">{{ type.name }}</option>
-                    {% endfor %}
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <select id="card-type" class="form-control" style="flex: 1;">
+                        {% for key, type in component_types %}
+                            <option value="{{ key }}">{{ type.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="text" id="custom-type-name" class="form-control" placeholder="Custom type name" style="flex: 1; display: none;" />
+                    <button type="button" id="toggle-custom-type" class="btn btn-sm btn-outline">Custom</button>
+                </div>
+            </div>
+            
+            {# Saved Type Variants #}
+            <div class="control-group">
+                <label>Load Saved Type</label>
+                <select id="saved-types" class="form-control">
+                    <option value="">-- Select a saved type --</option>
+                    <optgroup label="Built-in Types">
+                        <option value="card-property">Property Card</option>
+                        <option value="card-business">Business Card</option>
+                    </optgroup>
+                    <optgroup label="Custom Types" id="custom-types-group">
+                        {# Custom types will be loaded here #}
+                    </optgroup>
                 </select>
             </div>
 
@@ -208,9 +227,27 @@
 
             {# Export Options #}
             <div class="control-section">
-                <h3>Export</h3>
-                <button type="button" class="btn btn-primary" id="export-code">Export Twig Code</button>
-                <button type="button" class="btn btn-secondary" id="copy-code">Copy to Clipboard</button>
+                <h3>Export & Save</h3>
+                <button type="button" class="btn btn-primary" id="save-as-type">Save as Type</button>
+                <button type="button" class="btn btn-secondary" id="export-code">Export Twig Code</button>
+                <button type="button" class="btn btn-outline" id="copy-code">Copy to Clipboard</button>
+                
+                {# Save Type Modal #}
+                <div id="save-type-form" style="display: none; margin-top: 15px; padding: 15px; background: #f5f5f5; border-radius: 4px;">
+                    <h4>Save Card Configuration</h4>
+                    <div class="control-group">
+                        <label>Type Name (e.g., luxury-property)</label>
+                        <input type="text" id="save-type-name" class="form-control" placeholder="Enter type name" />
+                    </div>
+                    <div class="control-group">
+                        <label>Description</label>
+                        <input type="text" id="save-type-description" class="form-control" placeholder="Brief description" />
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <button type="button" class="btn btn-primary btn-sm" id="confirm-save-type">Save</button>
+                        <button type="button" class="btn btn-outline btn-sm" id="cancel-save-type">Cancel</button>
+                    </div>
+                </div>
             </div>
         </div>
 

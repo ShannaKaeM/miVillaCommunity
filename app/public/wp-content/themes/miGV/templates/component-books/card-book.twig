@@ -6,6 +6,7 @@
   
   Usage:
   {% include 'component-books/card-book.twig' with {
+    type: 'property',  // Optional: loads saved type configuration
     variant: 'default',
     title: 'Card Title',
     subtitle: 'Card Subtitle',
@@ -27,12 +28,129 @@
     class: 'additional-classes'
   } %}
   
+  Or with saved type and data object:
+  {% include 'component-books/card-book.twig' with {
+    type: 'property',
+    data: property_post
+  } %}
+  
   Available variants:
   - default: Standard vertical card
   - horizontal: Horizontal card with image on left
   - compact: Minimal card without image
   - featured: Larger card with prominent image
+  
+  Built-in types:
+  - property: Property listing card
+  - business: Business listing card
+  - (custom types created in Mi Design Book)
 #}
+
+{# Load type configuration if specified #}
+{% if type %}
+  {% set card_types = function('get_option', 'mi_card_types', {}) %}
+  {% set built_in_types = {
+    'property': {
+      'variant': 'default',
+      'show_badges': true,
+      'show_meta': true,
+      'badge_mappings': {
+        'available': 'primary',
+        'sold': 'secondary-dark',
+        'pending': 'neutral',
+        'rented': 'secondary'
+      }
+    },
+    'business': {
+      'variant': 'default',
+      'show_badges': true,
+      'show_meta': true
+    }
+  } %}
+  
+  {# Check if type exists in custom or built-in types #}
+  {% if card_types[type] %}
+    {% set type_config = card_types[type].configuration %}
+  {% elseif built_in_types[type] %}
+    {% set type_config = built_in_types[type] %}
+  {% endif %}
+  
+  {# Apply type configuration if found #}
+  {% if type_config %}
+    {% set variant = type_config.variant ?? variant ?? 'default' %}
+    {% set cornerStyle = type_config.cornerStyle ?? cornerStyle %}
+    {% set showShadow = type_config.showShadow ?? showShadow ?? true %}
+    {% set showHover = type_config.showHover ?? showHover ?? true %}
+  {% endif %}
+  
+  {# Handle data object if provided #}
+  {% if data %}
+    {% set title = title ?? data.title %}
+    {% set description = description ?? data.excerpt ?? data.content|excerpt(30) %}
+    {% set image = image ?? (data.thumbnail ? data.thumbnail.src : '') %}
+    {% set link = link ?? data.link %}
+    
+    {# Property-specific data mapping #}
+    {% if type == 'property' and data.meta %}
+      {% set price = data.meta('property_price') %}
+      {% if price %}
+        {% set pretitle = pretitle ?? '$' ~ price|number_format %}
+      {% endif %}
+      
+      {% set status = data.meta('property_status') %}
+      {% if status and not badges %}
+        {% set badges = [{
+          'content': status|replace({'_': ' '})|title,
+          'variant': type_config.badge_mappings[status] ?? 'neutral'
+        }] %}
+      {% endif %}
+      
+      {% if not meta %}
+        {% set meta = [] %}
+        {% if data.meta('property_bedrooms') %}
+          {% set meta = meta|merge([{'icon': 'bed', 'value': data.meta('property_bedrooms') ~ ' Beds'}]) %}
+        {% endif %}
+        {% if data.meta('property_bathrooms') %}
+          {% set meta = meta|merge([{'icon': 'bath', 'value': data.meta('property_bathrooms') ~ ' Baths'}]) %}
+        {% endif %}
+        {% if data.meta('property_sqft') %}
+          {% set meta = meta|merge([{'icon': 'home', 'value': data.meta('property_sqft')|number_format ~ ' sqft'}]) %}
+        {% endif %}
+      {% endif %}
+      
+      {% set address = data.meta('property_address') %}
+      {% set city = data.meta('property_city') %}
+      {% if address and city %}
+        {% set subtitle = subtitle ?? address ~ ', ' ~ city %}
+      {% endif %}
+    {% endif %}
+    
+    {# Business-specific data mapping #}
+    {% if type == 'business' and data.meta %}
+      {% set business_type = data.meta('business_type') %}
+      {% if business_type and not badges %}
+        {% set badges = [{'content': business_type|title, 'variant': 'primary'}] %}
+      {% endif %}
+      
+      {% if not meta %}
+        {% set meta = [] %}
+        {% if data.meta('business_phone') %}
+          {% set meta = meta|merge([{'icon': 'phone', 'value': data.meta('business_phone')}]) %}
+        {% endif %}
+        {% if data.meta('business_hours') %}
+          {% set meta = meta|merge([{'icon': 'clock', 'value': data.meta('business_hours')|split('\n')|first}]) %}
+        {% endif %}
+      {% endif %}
+      
+      {% set subtitle = subtitle ?? data.meta('business_address') %}
+    {% endif %}
+    
+    {# Default action if none provided #}
+    {% if not actions and link %}
+      {% set actions = [{'label': 'View Details', 'variant': 'primary', 'href': link}] %}
+    {% endif %}
+  {% endif %}
+{% endif %}
 
 {% set card_variants = {
   default: {
@@ -61,6 +179,18 @@
 {% set config = card_variants[variant] ?? card_variants.default %}
 {% set element_class = ['villa-card', config.class, class]|join(' ')|trim %}
 {% set show_image = config.show_image ?? (image ? true : false) %}
+
+{# Apply additional classes based on options #}
+{% set corner_classes = {
+  'sharp': 'corner-sharp',
+  'rounded': 'corner-rounded',
+  'extra-rounded': 'corner-extra-rounded',
+  'pill': 'corner-pill'
+} %}
+{% set corner_class = corner_classes[cornerStyle] ?? '' %}
+{% set shadow_class = showShadow ?? true ? 'has-shadow' : '' %}
+{% set hover_class = showHover ?? true ? 'has-hover' : '' %}
+{% set element_class = [element_class, corner_class, shadow_class, hover_class]|join(' ')|trim %}
 
 {# Render the card #}
 <article class="{{ element_class }}" style="
@@ -148,6 +278,25 @@ onmouseout="this.style.boxShadow='var(--wp--custom--layout--shadows--sm)'; this.
       } -%}
       flex-grow: 1;
     ">
+      {% if pretitle %}
+        <div class="villa-card__pretitle" style="
+          {%- include 'primitive-books/typography-book.twig' with {
+            font_family: 'inter',
+            font_size: 'small',
+            font_weight: 'semiBold',
+            line_height: 'tight',
+            letter_spacing: 'wide',
+            text_transform: 'uppercase'
+          } -%}
+          {%- include 'primitive-books/color-book.twig' with {
+            color: 'primary'
+          } -%}
+          {%- include 'primitive-books/spacing-book.twig' with {
+            margin_bottom: 'xs'
+          } -%}
+        ">{{ pretitle }}</div>
+      {% endif %}
+      
       {% if title %}
         <h3 class="villa-card__title" style="
           {%- include 'primitive-books/typography-book.twig' with {

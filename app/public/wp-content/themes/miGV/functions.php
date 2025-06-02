@@ -431,3 +431,131 @@ function mi_get_post_data_handler() {
 }
 add_action('wp_ajax_mi_get_post_data', 'mi_get_post_data_handler');
 add_action('wp_ajax_nopriv_mi_get_post_data', 'mi_get_post_data_handler');
+
+/**
+ * AJAX handler for saving card type configurations
+ */
+function mi_save_card_type_handler() {
+    // Verify nonce
+    if (!wp_verify_nonce($_POST['nonce'], 'mi_design_book_nonce')) {
+        wp_die('Security check failed');
+    }
+    
+    // Check permissions
+    if (!current_user_can('edit_theme_options')) {
+        wp_send_json_error('Insufficient permissions');
+    }
+    
+    $type_name = sanitize_key($_POST['type_name']);
+    $configuration = json_decode(stripslashes($_POST['configuration']), true);
+    
+    if (empty($type_name) || empty($configuration)) {
+        wp_send_json_error('Invalid data');
+    }
+    
+    // Get existing card types
+    $card_types = get_option('mi_card_types', []);
+    
+    // Add or update the card type
+    $card_types[$type_name] = [
+        'name' => sanitize_text_field($_POST['display_name']),
+        'description' => sanitize_text_field($_POST['description']),
+        'configuration' => $configuration,
+        'created' => current_time('mysql'),
+        'author' => get_current_user_id()
+    ];
+    
+    // Save to database
+    update_option('mi_card_types', $card_types);
+    
+    wp_send_json_success([
+        'message' => 'Card type saved successfully',
+        'type_name' => $type_name
+    ]);
+}
+add_action('wp_ajax_mi_save_card_type', 'mi_save_card_type_handler');
+
+/**
+ * AJAX handler for loading card types
+ */
+function mi_get_card_types_handler() {
+    // Verify nonce
+    if (!wp_verify_nonce($_POST['nonce'], 'mi_design_book_nonce')) {
+        wp_die('Security check failed');
+    }
+    
+    $card_types = get_option('mi_card_types', []);
+    
+    // Add built-in types
+    $built_in_types = [
+        'card-property' => [
+            'name' => 'Property Card',
+            'description' => 'Standard property listing card',
+            'configuration' => [
+                'variant' => 'default',
+                'badges' => [
+                    ['field' => 'property_status', 'variant' => 'primary'],
+                    ['field' => 'property_type', 'variant' => 'primary-light']
+                ],
+                'meta' => [
+                    ['field' => 'property_bedrooms', 'icon' => 'bed', 'suffix' => ' Beds'],
+                    ['field' => 'property_bathrooms', 'icon' => 'bath', 'suffix' => ' Baths'],
+                    ['field' => 'property_sqft', 'icon' => 'home', 'suffix' => ' sqft']
+                ],
+                'pretitle_field' => 'property_price',
+                'subtitle_fields' => ['property_address', 'property_city']
+            ]
+        ],
+        'card-business' => [
+            'name' => 'Business Card',
+            'description' => 'Standard business listing card',
+            'configuration' => [
+                'variant' => 'default',
+                'badges' => [
+                    ['field' => 'business_type', 'variant' => 'primary']
+                ],
+                'meta' => [
+                    ['field' => 'business_phone', 'icon' => 'phone'],
+                    ['field' => 'business_hours', 'icon' => 'clock']
+                ],
+                'subtitle_field' => 'business_address'
+            ]
+        ]
+    ];
+    
+    wp_send_json_success([
+        'built_in' => $built_in_types,
+        'custom' => $card_types
+    ]);
+}
+add_action('wp_ajax_mi_get_card_types', 'mi_get_card_types_handler');
+
+/**
+ * AJAX handler for deleting card types
+ */
+function mi_delete_card_type_handler() {
+    // Verify nonce
+    if (!wp_verify_nonce($_POST['nonce'], 'mi_design_book_nonce')) {
+        wp_die('Security check failed');
+    }
+    
+    // Check permissions
+    if (!current_user_can('edit_theme_options')) {
+        wp_send_json_error('Insufficient permissions');
+    }
+    
+    $type_name = sanitize_key($_POST['type_name']);
+    
+    // Get existing card types
+    $card_types = get_option('mi_card_types', []);
+    
+    // Remove the card type
+    if (isset($card_types[$type_name])) {
+        unset($card_types[$type_name]);
+        update_option('mi_card_types', $card_types);
+        wp_send_json_success('Card type deleted');
+    } else {
+        wp_send_json_error('Card type not found');
+    }
+}
+add_action('wp_ajax_mi_delete_card_type', 'mi_delete_card_type_handler');
