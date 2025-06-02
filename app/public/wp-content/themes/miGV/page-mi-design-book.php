@@ -61,9 +61,17 @@ $context['card_options'] = [
     ],
     'button_variants' => [
         'primary' => 'Primary',
+        'primary-light' => 'Primary Light',
+        'primary-dark' => 'Primary Dark',
         'secondary' => 'Secondary',
-        'outline' => 'Outline',
-        'ghost' => 'Ghost'
+        'secondary-light' => 'Secondary Light',
+        'secondary-dark' => 'Secondary Dark',
+        'neutral' => 'Neutral',
+        'neutral-light' => 'Neutral Light',
+        'neutral-dark' => 'Neutral Dark',
+        'base' => 'Base',
+        'base-light' => 'Base Light',
+        'base-dark' => 'Base Dark'
     ],
     'button_sizes' => [
         'sm' => 'Small',
@@ -71,11 +79,18 @@ $context['card_options'] = [
         'lg' => 'Large'
     ],
     'badge_variants' => [
-        'default' => 'Default',
         'primary' => 'Primary',
-        'success' => 'Success',
-        'warning' => 'Warning',
-        'danger' => 'Danger'
+        'primary-light' => 'Primary Light',
+        'primary-dark' => 'Primary Dark',
+        'secondary' => 'Secondary',
+        'secondary-light' => 'Secondary Light',
+        'secondary-dark' => 'Secondary Dark',
+        'neutral' => 'Neutral',
+        'neutral-light' => 'Neutral Light',
+        'neutral-dark' => 'Neutral Dark',
+        'base' => 'Base',
+        'base-light' => 'Base Light',
+        'base-dark' => 'Base Dark'
     ],
     'corner_styles' => [
         'sharp' => 'Sharp (0px)',

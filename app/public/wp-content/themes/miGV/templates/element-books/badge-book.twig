@@ -15,13 +15,10 @@
   } %}
   
   Available variants:
-  - primary: Primary brand color badges
-  - secondary: Secondary brand color badges
-  - success: Positive status (available, active, complete)
-  - warning: Warning status (pending, maintenance)
-  - danger: Error/urgent status (overdue, blocked)
-  - info: Informational badges
-  - neutral: Default neutral badges
+  - primary, primary-light, primary-dark
+  - secondary, secondary-light, secondary-dark
+  - neutral, neutral-light, neutral-dark
+  - base, base-light, base-dark
   
   Available sizes:
   - sm: Small badges
@@ -30,47 +27,77 @@
 #}
 
 {% set badge_styles = {
-  primary: {
+  'primary': {
     color: 'extreme-light',
     background_color: 'primary',
     border_color: 'primary',
     class: 'badge-primary'
   },
-  secondary: {
+  'primary-light': {
+    color: 'base-darkest',
+    background_color: 'primary-light',
+    border_color: 'primary-light',
+    class: 'badge-primary-light'
+  },
+  'primary-dark': {
+    color: 'extreme-light',
+    background_color: 'primary-dark',
+    border_color: 'primary-dark',
+    class: 'badge-primary-dark'
+  },
+  'secondary': {
     color: 'extreme-light',
     background_color: 'secondary',
     border_color: 'secondary',
     class: 'badge-secondary'
   },
-  success: {
-    color: 'extreme-light',
-    background_color: 'primary',
-    border_color: 'primary',
-    class: 'badge-success'
-  },
-  warning: {
+  'secondary-light': {
     color: 'base-darkest',
-    background_color: 'neutral-light',
-    border_color: 'neutral',
-    class: 'badge-warning'
+    background_color: 'secondary-light',
+    border_color: 'secondary-light',
+    class: 'badge-secondary-light'
   },
-  danger: {
+  'secondary-dark': {
     color: 'extreme-light',
     background_color: 'secondary-dark',
     border_color: 'secondary-dark',
-    class: 'badge-danger'
+    class: 'badge-secondary-dark'
   },
-  info: {
-    color: 'extreme-light',
-    background_color: 'primary-light',
-    border_color: 'primary-light',
-    class: 'badge-info'
-  },
-  neutral: {
+  'neutral': {
     color: 'base-darkest',
-    background_color: 'base-lightest',
-    border_color: 'base-light',
+    background_color: 'neutral',
+    border_color: 'neutral',
     class: 'badge-neutral'
+  },
+  'neutral-light': {
+    color: 'base-darkest',
+    background_color: 'neutral-light',
+    border_color: 'neutral-light',
+    class: 'badge-neutral-light'
+  },
+  'neutral-dark': {
+    color: 'extreme-light',
+    background_color: 'neutral-dark',
+    border_color: 'neutral-dark',
+    class: 'badge-neutral-dark'
+  },
+  'base': {
+    color: 'extreme-light',
+    background_color: 'base',
+    border_color: 'base',
+    class: 'badge-base'
+  },
+  'base-light': {
+    color: 'base-darkest',
+    background_color: 'base-light',
+    border_color: 'base-light',
+    class: 'badge-base-light'
+  },
+  'base-dark': {
+    color: 'extreme-light',
+    background_color: 'base-dark',
+    border_color: 'base-dark',
+    class: 'badge-base-dark'
   }
 } %}
 
@@ -97,16 +124,16 @@
 
 {# Special badge types based on content #}
 {% set special_badges = {
-  'NEW': 'danger',
+  'NEW': 'secondary',
   'PINNED': 'primary',
-  'Available': 'success',
+  'Available': 'primary',
   'Occupied': 'neutral',
-  'Maintenance': 'warning',
-  'For Sale': 'info',
-  'For Rent': 'info',
-  'High': 'danger',
-  'Medium': 'warning',
-  'Low': 'neutral'
+  'Maintenance': 'secondary-light',
+  'For Sale': 'primary-dark',
+  'For Rent': 'primary-light',
+  'High': 'secondary-dark',
+  'Medium': 'neutral',
+  'Low': 'base-light'
 } %}
 
 {# Get the style and size configurations #}

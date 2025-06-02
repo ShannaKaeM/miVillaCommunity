@@ -14,11 +14,10 @@
   } %}
   
   Available variants:
-  - primary: Main action buttons
-  - secondary: Secondary action buttons
-  - outline: Outlined buttons
-  - ghost: Text-only buttons
-  - danger: Destructive action buttons
+  - primary, primary-light, primary-dark
+  - secondary, secondary-light, secondary-dark
+  - neutral, neutral-light, neutral-dark
+  - base, base-light, base-dark
   
   Available sizes:
   - sm: Small buttons
@@ -27,40 +26,89 @@
 #}
 
 {% set button_styles = {
-  primary: {
+  'primary': {
     color: 'extreme-light',
     background_color: 'primary',
     border_color: 'primary',
     font_weight: 'semiBold',
     class: 'btn-primary'
   },
-  secondary: {
+  'primary-light': {
+    color: 'base-darkest',
+    background_color: 'primary-light',
+    border_color: 'primary-light',
+    font_weight: 'medium',
+    class: 'btn-primary-light'
+  },
+  'primary-dark': {
+    color: 'extreme-light',
+    background_color: 'primary-dark',
+    border_color: 'primary-dark',
+    font_weight: 'semiBold',
+    class: 'btn-primary-dark'
+  },
+  'secondary': {
     color: 'extreme-light',
     background_color: 'secondary',
     border_color: 'secondary',
     font_weight: 'medium',
     class: 'btn-secondary'
   },
-  outline: {
-    color: 'primary',
-    background_color: 'transparent',
-    border_color: 'primary',
+  'secondary-light': {
+    color: 'base-darkest',
+    background_color: 'secondary-light',
+    border_color: 'secondary-light',
     font_weight: 'medium',
-    class: 'btn-outline'
+    class: 'btn-secondary-light'
   },
-  ghost: {
-    color: 'primary',
-    background_color: 'transparent',
-    border_color: 'transparent',
-    font_weight: 'medium',
-    class: 'btn-ghost'
-  },
-  danger: {
+  'secondary-dark': {
     color: 'extreme-light',
     background_color: 'secondary-dark',
     border_color: 'secondary-dark',
     font_weight: 'semiBold',
-    class: 'btn-danger'
+    class: 'btn-secondary-dark'
+  },
+  'neutral': {
+    color: 'base-darkest',
+    background_color: 'neutral',
+    border_color: 'neutral',
+    font_weight: 'medium',
+    class: 'btn-neutral'
+  },
+  'neutral-light': {
+    color: 'base-darkest',
+    background_color: 'neutral-light',
+    border_color: 'neutral-light',
+    font_weight: 'medium',
+    class: 'btn-neutral-light'
+  },
+  'neutral-dark': {
+    color: 'extreme-light',
+    background_color: 'neutral-dark',
+    border_color: 'neutral-dark',
+    font_weight: 'medium',
+    class: 'btn-neutral-dark'
+  },
+  'base': {
+    color: 'extreme-light',
+    background_color: 'base',
+    border_color: 'base',
+    font_weight: 'medium',
+    class: 'btn-base'
+  },
+  'base-light': {
+    color: 'base-darkest',
+    background_color: 'base-light',
+    border_color: 'base-light',
+    font_weight: 'medium',
+    class: 'btn-base-light'
+  },
+  'base-dark': {
+    color: 'extreme-light',
+    background_color: 'base-dark',
+    border_color: 'base-dark',
+    font_weight: 'medium',
+    class: 'btn-base-dark'
   }
 } %}
 
