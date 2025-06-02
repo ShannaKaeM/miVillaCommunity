@@ -375,3 +375,59 @@ class MiGVSite extends Timber\Site {
 new MiGVSite();
 
 // Design book AJAX handlers removed - functionality can be rebuilt as needed
+
+/**
+ * AJAX handler for Mi Design Book - fetch post data
+ */
+function mi_get_post_data_handler() {
+    // Verify nonce
+    if (!wp_verify_nonce($_POST['nonce'], 'mi_design_book_nonce')) {
+        wp_die('Security check failed');
+    }
+    
+    $post_id = intval($_POST['post_id']);
+    $post = Timber::get_post($post_id);
+    
+    if (!$post) {
+        wp_send_json_error('Post not found');
+    }
+    
+    // Prepare response data based on post type
+    $response = [
+        'title' => $post->title(),
+        'description' => $post->excerpt() ?: wp_trim_words($post->content(), 30),
+        'image' => $post->thumbnail() ? $post->thumbnail()->src('large') : '',
+        'link' => $post->link(),
+        'post_type' => $post->post_type
+    ];
+    
+    // Add custom fields based on post type
+    if ($post->post_type === 'property') {
+        $response['fields'] = [
+            'price' => get_post_meta($post_id, 'property_price', true),
+            'bedrooms' => get_post_meta($post_id, 'property_bedrooms', true),
+            'bathrooms' => get_post_meta($post_id, 'property_bathrooms', true),
+            'sqft' => get_post_meta($post_id, 'property_sqft', true),
+            'status' => get_post_meta($post_id, 'property_status', true),
+            'type' => get_post_meta($post_id, 'property_type', true),
+            'address' => get_post_meta($post_id, 'property_address', true),
+            'city' => get_post_meta($post_id, 'property_city', true),
+            'state' => get_post_meta($post_id, 'property_state', true),
+            'features' => get_post_meta($post_id, 'property_features', true),
+            'year_built' => get_post_meta($post_id, 'property_year_built', true)
+        ];
+    } elseif ($post->post_type === 'business') {
+        $response['fields'] = [
+            'type' => get_post_meta($post_id, 'business_type', true),
+            'phone' => get_post_meta($post_id, 'business_phone', true),
+            'email' => get_post_meta($post_id, 'business_email', true),
+            'website' => get_post_meta($post_id, 'business_website', true),
+            'address' => get_post_meta($post_id, 'business_address', true),
+            'hours' => get_post_meta($post_id, 'business_hours', true)
+        ];
+    }
+    
+    wp_send_json_success($response);
+}
+add_action('wp_ajax_mi_get_post_data', 'mi_get_post_data_handler');
+add_action('wp_ajax_nopriv_mi_get_post_data', 'mi_get_post_data_handler');

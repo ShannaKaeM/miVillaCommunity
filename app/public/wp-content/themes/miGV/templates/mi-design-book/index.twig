@@ -12,6 +12,50 @@
         <div class="controls-panel">
             <h2>Card Configuration</h2>
             
+            {# Data Source Selection #}
+            <div class="control-section" style="border-top: none; padding-top: 0; margin-top: 0;">
+                <h3>Data Source</h3>
+                <div class="control-group">
+                    <label>
+                        <input type="radio" name="data-source" value="static" checked /> Static Data (Manual Entry)
+                    </label>
+                    <label style="margin-left: 20px;">
+                        <input type="radio" name="data-source" value="dynamic" /> Dynamic Data (From Post)
+                    </label>
+                </div>
+                
+                {# Dynamic Data Selector #}
+                <div id="dynamic-data-selector" style="display: none;">
+                    <div class="control-group">
+                        <label>Select Post</label>
+                        <select id="dynamic-post-selector" class="form-control">
+                            <option value="">-- Select a post --</option>
+                            <optgroup label="Properties">
+                                {% for property in properties %}
+                                    <option value="{{ property.id }}" data-type="property">
+                                        {{ property.title }} 
+                                        {% if property.meta('property_status') %}
+                                            ({{ property.meta('property_status')|capitalize }})
+                                        {% endif %}
+                                    </option>
+                                {% endfor %}
+                            </optgroup>
+                            <optgroup label="Businesses">
+                                {% for business in businesses %}
+                                    <option value="{{ business.id }}" data-type="business">
+                                        {{ business.title }}
+                                    </option>
+                                {% endfor %}
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="field-mapping-info" style="margin-top: 10px; padding: 10px; background: #f0f0f0; border-radius: 4px; font-size: 0.875rem;">
+                        <strong>Field Mappings:</strong><br/>
+                        <span id="field-mappings">Select a post to see field mappings</span>
+                    </div>
+                </div>
+            </div>
+
             {# Card Type Selection #}
             <div class="control-group">
                 <label>Card Type</label>

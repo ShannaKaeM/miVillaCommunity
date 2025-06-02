@@ -36,6 +36,32 @@
         }
     };
 
+    // Field mappings for dynamic data
+    const fieldMappings = {
+        property: {
+            title: 'Post Title',
+            description: 'Post Excerpt',
+            image: 'Featured Image',
+            'property_price': 'Price Badge/Meta',
+            'property_bedrooms': 'Bedrooms Meta',
+            'property_bathrooms': 'Bathrooms Meta',
+            'property_sqft': 'Square Feet Meta',
+            'property_status': 'Status Badge',
+            'property_type': 'Type Badge',
+            'property_address': 'Address Meta',
+            'property_city': 'City Meta'
+        },
+        business: {
+            title: 'Post Title',
+            description: 'Post Excerpt',
+            image: 'Featured Image',
+            'business_type': 'Type Badge',
+            'business_phone': 'Phone Meta',
+            'business_hours': 'Hours Meta',
+            'business_website': 'Website Button'
+        }
+    };
+
     // Initialize on document ready
     $(document).ready(function() {
         initializeEventHandlers();
@@ -45,6 +71,31 @@
 
     // Initialize all event handlers
     function initializeEventHandlers() {
+        // Data source toggle
+        $('input[name="data-source"]').on('change', function() {
+            const isDynamic = $(this).val() === 'dynamic';
+            $('#dynamic-data-selector').toggle(isDynamic);
+            
+            if (!isDynamic) {
+                // Clear dynamic data when switching back to static
+                $('#dynamic-post-selector').val('');
+                $('.form-control').prop('readonly', false);
+            }
+        });
+
+        // Dynamic post selector
+        $('#dynamic-post-selector').on('change', function() {
+            const postId = $(this).val();
+            const postType = $(this).find(':selected').data('type');
+            
+            if (postId) {
+                fetchPostData(postId, postType);
+            } else {
+                // Clear fields if no post selected
+                $('.form-control').prop('readonly', false);
+                $('#field-mappings').text('Select a post to see field mappings');
+            }
+        });
         // Card type change
         $('#card-type').on('change', function() {
             cardState.type = $(this).val();
@@ -300,6 +351,172 @@
             updatePreview();
             updateCode();
         });
+    }
+
+    // Fetch post data via AJAX
+    function fetchPostData(postId, postType) {
+        $.ajax({
+            url: miDesignBook.ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'mi_get_post_data',
+                post_id: postId,
+                nonce: miDesignBook.nonce
+            },
+            beforeSend: function() {
+                $('#dynamic-post-selector').prop('disabled', true);
+                $('#field-mappings').html('<em>Loading...</em>');
+            },
+            success: function(response) {
+                if (response.success) {
+                    populateFieldsFromPost(response.data, postType);
+                    showFieldMappings(postType);
+                } else {
+                    alert('Error loading post data');
+                }
+            },
+            error: function() {
+                alert('Error connecting to server');
+            },
+            complete: function() {
+                $('#dynamic-post-selector').prop('disabled', false);
+            }
+        });
+    }
+
+    // Populate fields from post data
+    function populateFieldsFromPost(data, postType) {
+        // Basic fields
+        $('#card-title').val(data.title).prop('readonly', true);
+        $('#card-description').val(data.description).prop('readonly', true);
+        
+        // Set image
+        if (data.image) {
+            cardState.image = data.image;
+            updateImagePreview();
+        }
+        
+        // Clear existing badges and meta
+        cardState.badges = [];
+        cardState.meta = [];
+        
+        // Handle property-specific fields
+        if (postType === 'property' && data.fields) {
+            // Set card type
+            $('#card-type').val('property');
+            cardState.type = 'property';
+            
+            // Price
+            if (data.fields.price) {
+                $('#card-pretitle').val('$' + parseInt(data.fields.price).toLocaleString()).prop('readonly', true);
+                cardState.pretitle = '$' + parseInt(data.fields.price).toLocaleString();
+            }
+            
+            // Status badge
+            if (data.fields.status) {
+                const statusMap = {
+                    'available': 'primary',
+                    'sold': 'secondary-dark',
+                    'pending': 'neutral',
+                    'rented': 'secondary',
+                    'off_market': 'base'
+                };
+                cardState.badges.push({
+                    content: data.fields.status.charAt(0).toUpperCase() + data.fields.status.slice(1).replace('_', ' '),
+                    variant: statusMap[data.fields.status] || 'neutral'
+                });
+            }
+            
+            // Type badge
+            if (data.fields.type) {
+                cardState.badges.push({
+                    content: data.fields.type.charAt(0).toUpperCase() + data.fields.type.slice(1),
+                    variant: 'primary-light'
+                });
+            }
+            
+            // Property meta
+            if (data.fields.bedrooms) {
+                cardState.meta.push({ icon: 'bed', value: data.fields.bedrooms + ' Beds' });
+            }
+            if (data.fields.bathrooms) {
+                cardState.meta.push({ icon: 'bath', value: data.fields.bathrooms + ' Baths' });
+            }
+            if (data.fields.sqft) {
+                cardState.meta.push({ icon: 'home', value: parseInt(data.fields.sqft).toLocaleString() + ' sqft' });
+            }
+            
+            // Location
+            if (data.fields.address && data.fields.city) {
+                $('#card-subtitle').val(data.fields.address + ', ' + data.fields.city).prop('readonly', true);
+                cardState.subtitle = data.fields.address + ', ' + data.fields.city;
+            }
+            
+            // Update property-specific form fields
+            $('#property-price').val(data.fields.price).prop('readonly', true);
+            $('#property-bedrooms').val(data.fields.bedrooms).prop('readonly', true);
+            $('#property-bathrooms').val(data.fields.bathrooms).prop('readonly', true);
+            $('#property-sqft').val(data.fields.sqft).prop('readonly', true);
+            
+        } else if (postType === 'business' && data.fields) {
+            // Set card type
+            $('#card-type').val('business');
+            cardState.type = 'business';
+            
+            // Business type badge
+            if (data.fields.type) {
+                cardState.badges.push({
+                    content: data.fields.type.charAt(0).toUpperCase() + data.fields.type.slice(1),
+                    variant: 'primary'
+                });
+            }
+            
+            // Business meta
+            if (data.fields.phone) {
+                cardState.meta.push({ icon: 'phone', value: data.fields.phone });
+            }
+            if (data.fields.hours) {
+                cardState.meta.push({ icon: 'clock', value: data.fields.hours.split('\n')[0] }); // First line of hours
+            }
+            
+            // Address
+            if (data.fields.address) {
+                $('#card-subtitle').val(data.fields.address).prop('readonly', true);
+                cardState.subtitle = data.fields.address;
+            }
+            
+            // Update business-specific form fields
+            $('#business-category').val(data.fields.type).prop('readonly', true);
+            $('#business-hours').val(data.fields.hours).prop('readonly', true);
+        }
+        
+        // Add View Details button
+        cardState.actions = [{
+            label: 'View Details',
+            variant: 'primary',
+            size: 'md',
+            href: data.link || '#'
+        }];
+        
+        // Update displays
+        updateBadgesList();
+        updateActionsList();
+        updateTypeSpecificFields();
+        updatePreview();
+        updateCode();
+    }
+
+    // Show field mappings
+    function showFieldMappings(postType) {
+        const mappings = fieldMappings[postType] || {};
+        let html = '<div style="font-size: 0.8rem; line-height: 1.4;">';
+        
+        for (const [field, mapping] of Object.entries(mappings)) {
+            html += `<strong>${field}:</strong> → ${mapping}<br/>`;
+        }
+        
+        html += '</div>';
+        $('#field-mappings').html(html);
     }
 
     // Update image preview

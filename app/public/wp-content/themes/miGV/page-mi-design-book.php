@@ -26,6 +26,26 @@ wp_localize_script('mi-design-book', 'miDesignBook', [
 $context = Timber::context();
 $context['post'] = Timber::get_post();
 
+// Get available properties for dynamic data
+$properties = Timber::get_posts([
+    'post_type' => 'property',
+    'posts_per_page' => -1,
+    'orderby' => 'title',
+    'order' => 'ASC',
+    'post_status' => 'publish'
+]);
+$context['properties'] = $properties;
+
+// Get available businesses for dynamic data
+$businesses = Timber::get_posts([
+    'post_type' => 'business',
+    'posts_per_page' => -1,
+    'orderby' => 'title',
+    'order' => 'ASC',
+    'post_status' => 'publish'
+]);
+$context['businesses'] = $businesses;
+
 // Component types and their properties
 $context['component_types'] = [
     'property' => [
