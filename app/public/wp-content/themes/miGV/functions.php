@@ -79,6 +79,10 @@ function migv_setup() {
     // Add theme support for custom units
     add_theme_support('custom-units');
     
+    // Add theme support for theme.json
+    add_theme_support('wp-block-styles');
+    add_theme_support('appearance-tools');
+    
     // Add theme support for post formats
     add_theme_support('post-formats', array(
         'aside',

@@ -81,8 +81,8 @@
 
 .form-control:focus {
     outline: none;
-    border-color: #4CAF50;
-    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
+    border-color: var(--wp--preset--color--primary);
+    box-shadow: 0 0 0 2px rgba(90, 123, 124, 0.1);
 }
 
 .form-control-sm {
@@ -183,21 +183,21 @@ textarea.form-control {
 }
 
 .btn-primary {
-    background: #4CAF50;
-    color: white;
+    background: var(--wp--preset--color--primary);
+    color: var(--wp--preset--color--extreme-light);
 }
 
 .btn-primary:hover {
-    background: #45a049;
+    background: var(--wp--preset--color--primary-dark);
 }
 
 .btn-secondary {
-    background: #2196F3;
-    color: white;
+    background: var(--wp--preset--color--secondary);
+    color: var(--wp--preset--color--extreme-light);
 }
 
 .btn-secondary:hover {
-    background: #1976D2;
+    background: var(--wp--preset--color--secondary-dark);
 }
 
 .btn-outline {
@@ -343,7 +343,7 @@ textarea.form-control {
 }
 
 .sample-image-item:hover {
-    border-color: #4CAF50;
+    border-color: var(--wp--preset--color--primary);
 }
 
 .sample-image-item img {
@@ -440,7 +440,7 @@ input[type="checkbox"] {
 }
 
 .villa-card--featured {
-    border: 2px solid #4CAF50;
+    border: 2px solid var(--wp--preset--color--primary);
 }
 
 /* Card image */
@@ -491,23 +491,23 @@ input[type="checkbox"] {
 }
 
 .villa-badge--primary {
-    background: #4CAF50;
-    color: white;
+    background: var(--wp--preset--color--primary);
+    color: var(--wp--preset--color--extreme-light);
 }
 
 .villa-badge--success {
-    background: #22c55e;
-    color: white;
+    background: var(--wp--preset--color--accent);
+    color: var(--wp--preset--color--extreme-light);
 }
 
 .villa-badge--warning {
-    background: #f59e0b;
-    color: white;
+    background: var(--wp--preset--color--secondary-light);
+    color: var(--wp--preset--color--extreme-light);
 }
 
 .villa-badge--danger {
-    background: #ef4444;
-    color: white;
+    background: var(--wp--preset--color--secondary-dark);
+    color: var(--wp--preset--color--extreme-light);
 }
 
 /* Text elements */
@@ -580,32 +580,32 @@ input[type="checkbox"] {
 
 /* Button variants */
 .villa-btn--primary {
-    background: #4CAF50;
-    color: white;
+    background: var(--wp--preset--color--primary);
+    color: var(--wp--preset--color--extreme-light);
 }
 
 .villa-btn--primary:hover {
-    background: #45a049;
+    background: var(--wp--preset--color--primary-dark);
 }
 
 .villa-btn--secondary {
-    background: #2196F3;
-    color: white;
+    background: var(--wp--preset--color--secondary);
+    color: var(--wp--preset--color--extreme-light);
 }
 
 .villa-btn--secondary:hover {
-    background: #1976D2;
+    background: var(--wp--preset--color--secondary-dark);
 }
 
 .villa-btn--outline {
     background: transparent;
-    color: #4CAF50;
-    border: 2px solid #4CAF50;
+    color: var(--wp--preset--color--primary);
+    border: 2px solid var(--wp--preset--color--primary);
 }
 
 .villa-btn--outline:hover {
-    background: #4CAF50;
-    color: white;
+    background: var(--wp--preset--color--primary);
+    color: var(--wp--preset--color--extreme-light);
 }
 
 .villa-btn--ghost {
