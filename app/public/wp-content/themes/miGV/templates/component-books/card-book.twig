@@ -1,0 +1,261 @@
+{#
+  Card Book Component - Composable Card Component
+  
+  This component composes multiple elements to create flexible card layouts.
+  Used as the base for property cards, project cards, announcements, etc.
+  
+  Usage:
+  {% include 'component-books/card-book.twig' with {
+    variant: 'default',
+    title: 'Card Title',
+    subtitle: 'Card Subtitle',
+    description: 'Card description text...',
+    image: '/path/to/image.jpg',
+    badges: [
+      {content: 'Available', variant: 'success'},
+      {content: 'Featured', variant: 'primary'}
+    ],
+    meta: [
+      {icon: 'calendar', value: 'Jan 15, 2024'},
+      {icon: 'user', value: 'John Doe'}
+    ],
+    actions: [
+      {label: 'View Details', variant: 'primary', href: '/link'},
+      {label: 'Edit', variant: 'ghost', href: '/edit'}
+    ],
+    footer: 'Additional footer content',
+    class: 'additional-classes'
+  } %}
+  
+  Available variants:
+  - default: Standard vertical card
+  - horizontal: Horizontal card with image on left
+  - compact: Minimal card without image
+  - featured: Larger card with prominent image
+#}
+
+{% set card_variants = {
+  default: {
+    class: 'card-default',
+    image_height: '200px',
+    content_padding: 'lg'
+  },
+  horizontal: {
+    class: 'card-horizontal',
+    image_width: '150px',
+    content_padding: 'md'
+  },
+  compact: {
+    class: 'card-compact',
+    show_image: false,
+    content_padding: 'md'
+  },
+  featured: {
+    class: 'card-featured',
+    image_height: '300px',
+    content_padding: 'xl'
+  }
+} %}
+
+{# Get variant configuration #}
+{% set config = card_variants[variant] ?? card_variants.default %}
+{% set element_class = ['villa-card', config.class, class]|join(' ')|trim %}
+{% set show_image = config.show_image ?? (image ? true : false) %}
+
+{# Render the card #}
+<article class="{{ element_class }}" style="
+  {%- include 'primitive-books/color-book.twig' with {
+    background_color: 'extreme-light',
+    border_color: 'base-light'
+  } -%}
+  {%- include 'primitive-books/border-book.twig' with {
+    border_width: 'thin',
+    border_style: 'solid',
+    border_radius: 'lg'
+  } -%}
+  {%- include 'primitive-books/shadow-book.twig' with {
+    box_shadow: 'sm'
+  } -%}
+  {%- include 'primitive-books/animation-book.twig' with {
+    transition_property: 'all',
+    transition_duration: 'base',
+    transition_timing: 'ease'
+  } -%}
+  overflow: hidden;
+  {% if variant == 'horizontal' %}
+    {%- include 'primitive-books/layout-book.twig' with {
+      display: 'flex',
+      flex_direction: 'row'
+    } -%}
+  {% endif %}
+"
+onmouseover="this.style.boxShadow='var(--wp--custom--layout--shadows--md)'; this.style.transform='translateY(-2px)';"
+onmouseout="this.style.boxShadow='var(--wp--custom--layout--shadows--sm)'; this.style.transform='translateY(0)';">
+  
+  {% if show_image and image %}
+    <div class="villa-card__image" style="
+      {% if variant == 'horizontal' %}
+        width: {{ config.image_width }};
+        flex-shrink: 0;
+      {% else %}
+        height: {{ config.image_height }};
+      {% endif %}
+      overflow: hidden;
+      {%- include 'primitive-books/color-book.twig' with {
+        background_color: 'base-lightest'
+      } -%}
+    ">
+      <img src="{{ image }}" alt="{{ title|default('Card image') }}" style="
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      ">
+    </div>
+  {% endif %}
+  
+  <div class="villa-card__content" style="
+    {%- include 'primitive-books/layout-book.twig' with {
+      display: 'flex',
+      flex_direction: 'col',
+      flex_grow: '1'
+    } -%}
+  ">
+    {% if badges and badges|length > 0 %}
+      <div class="villa-card__badges" style="
+        {%- include 'primitive-books/spacing-book.twig' with {
+          padding: config.content_padding
+        } -%}
+        {%- include 'primitive-books/layout-book.twig' with {
+          display: 'flex',
+          flex_wrap: 'wrap',
+          gap: 'sm'
+        } -%}
+      ">
+        {% for badge in badges %}
+          {% include 'element-books/badge-book.twig' with {
+            content: badge.content,
+            variant: badge.variant ?? 'neutral',
+            size: badge.size ?? 'sm',
+            count: badge.count
+          } %}
+        {% endfor %}
+      </div>
+    {% endif %}
+    
+    <div class="villa-card__text" style="
+      {%- include 'primitive-books/spacing-book.twig' with {
+        padding: config.content_padding
+      } -%}
+      flex-grow: 1;
+    ">
+      {% if title %}
+        <h3 class="villa-card__title" style="
+          {%- include 'primitive-books/typography-book.twig' with {
+            font_family: 'playfair-display',
+            font_size: 'large',
+            font_weight: 'semiBold',
+            line_height: 'tight'
+          } -%}
+          {%- include 'primitive-books/color-book.twig' with {
+            color: 'base-darkest'
+          } -%}
+          {%- include 'primitive-books/spacing-book.twig' with {
+            margin_bottom: 'sm'
+          } -%}
+        ">{{ title }}</h3>
+      {% endif %}
+      
+      {% if subtitle %}
+        <p class="villa-card__subtitle" style="
+          {%- include 'primitive-books/typography-book.twig' with {
+            font_family: 'inter',
+            font_size: 'medium',
+            font_weight: 'medium',
+            line_height: 'normal'
+          } -%}
+          {%- include 'primitive-books/color-book.twig' with {
+            color: 'base-dark'
+          } -%}
+          {%- include 'primitive-books/spacing-book.twig' with {
+            margin_bottom: 'md'
+          } -%}
+        ">{{ subtitle }}</p>
+      {% endif %}
+      
+      {% if description %}
+        <p class="villa-card__description" style="
+          {%- include 'primitive-books/typography-book.twig' with {
+            font_family: 'inter',
+            font_size: 'medium',
+            line_height: 'relaxed'
+          } -%}
+          {%- include 'primitive-books/color-book.twig' with {
+            color: 'base'
+          } -%}
+          {%- include 'primitive-books/spacing-book.twig' with {
+            margin_bottom: 'md'
+          } -%}
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        ">{{ description }}</p>
+      {% endif %}
+      
+      {% if meta and meta|length > 0 %}
+        <div class="villa-card__meta" style="
+          {%- include 'primitive-books/spacing-book.twig' with {
+            margin_top: 'md'
+          } -%}
+        ">
+          {% include 'element-books/meta-info-book.twig' with {
+            items: meta,
+            size: 'sm'
+          } %}
+        </div>
+      {% endif %}
+    </div>
+    
+    {% if actions and actions|length > 0 %}
+      <div class="villa-card__actions" style="
+        {%- include 'primitive-books/spacing-book.twig' with {
+          padding: config.content_padding,
+          padding_top: '0'
+        } -%}
+        {%- include 'primitive-books/layout-book.twig' with {
+          display: 'flex',
+          gap: 'sm',
+          justify_content: 'start'
+        } -%}
+      ">
+        {% for action in actions %}
+          {% include 'element-books/button-book.twig' with {
+            content: action.label,
+            variant: action.variant ?? 'primary',
+            size: action.size ?? 'sm',
+            href: action.href,
+            class: action.class
+          } %}
+        {% endfor %}
+      </div>
+    {% endif %}
+    
+    {% if footer %}
+      <div class="villa-card__footer" style="
+        {%- include 'primitive-books/spacing-book.twig' with {
+          padding: config.content_padding
+        } -%}
+        {%- include 'primitive-books/color-book.twig' with {
+          background_color: 'base-lightest',
+          border_color: 'base-light'
+        } -%}
+        {%- include 'primitive-books/border-book.twig' with {
+          border_top_width: 'thin',
+          border_top_style: 'solid'
+        } -%}
+      ">
+        {{ footer }}
+      </div>
+    {% endif %}
+  </div>
+</article>

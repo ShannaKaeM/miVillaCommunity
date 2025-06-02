@@ -1,0 +1,295 @@
+{% extends "base.twig" %}
+
+{% block content %}
+<div class="design-book-dashboard">
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="design-book-logo">
+                <h1 class="dashboard-title">🎨 Design Book</h1>
+                <p class="dashboard-subtitle">Visual Design System Manager</p>
+            </div>
+        </header>
+
+        <!-- Navigation Grid -->
+        <div class="navigation-grid">
+            {% for item in design_book.navigation %}
+            <a href="{{ item.url }}" class="nav-card {{ item.active ? 'active' : '' }}">
+                <div class="nav-card-icon">
+                    {% if item.slug == 'typography' %}
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 7V4H20V7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M9 20H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M12 4V20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    {% elseif item.slug == 'colors' %}
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                            <path d="M12 2A10 10 0 0 0 12 22A10 10 0 0 1 12 2Z" fill="currentColor"/>
+                        </svg>
+                    {% elseif item.slug == 'layout' %}
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+                            <path d="M9 3V21" stroke="currentColor" stroke-width="2"/>
+                            <path d="M3 9H21" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    {% elseif item.slug == 'components' %}
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="4" y="4" width="6" height="6" rx="1" stroke="currentColor" stroke-width="2"/>
+                            <rect x="14" y="4" width="6" height="6" rx="1" stroke="currentColor" stroke-width="2"/>
+                            <rect x="4" y="14" width="6" height="6" rx="1" stroke="currentColor" stroke-width="2"/>
+                            <rect x="14" y="14" width="6" height="6" rx="1" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    {% endif %}
+                </div>
+                <div class="nav-card-content">
+                    <h3 class="nav-card-title">{{ item.name }}</h3>
+                    <p class="nav-card-description">
+                        {% if item.slug == 'typography' %}
+                            Manage fonts, sizes, and text styles
+                        {% elseif item.slug == 'colors' %}
+                            Define color palettes and themes
+                        {% elseif item.slug == 'layout' %}
+                            Configure spacing and grid systems
+                        {% elseif item.slug == 'components' %}
+                            Build and manage UI components
+                        {% endif %}
+                    </p>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <h4 class="stat-number">12</h4>
+                <p class="stat-label">Typography Styles</p>
+            </div>
+            <div class="stat-card">
+                <h4 class="stat-number">24</h4>
+                <p class="stat-label">Color Tokens</p>
+            </div>
+            <div class="stat-card">
+                <h4 class="stat-number">8</h4>
+                <p class="stat-label">Components</p>
+            </div>
+            <div class="stat-card">
+                <h4 class="stat-number">16</h4>
+                <p class="stat-label">Layout Tokens</p>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="recent-activity">
+            <h3 class="activity-header">Recent Updates</h3>
+            <div class="activity-list">
+                <div class="activity-item">
+                    <span class="activity-icon">🎨</span>
+                    <div class="activity-content">
+                        <p class="activity-title"><strong>Typography updated</strong></p>
+                        <small class="activity-time">2 hours ago</small>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <span class="activity-icon">🌈</span>
+                    <div class="activity-content">
+                        <p class="activity-title"><strong>Color palette refined</strong></p>
+                        <small class="activity-time">1 day ago</small>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <span class="activity-icon">📐</span>
+                    <div class="activity-content">
+                        <p class="activity-title"><strong>Spacing tokens added</strong></p>
+                        <small class="activity-time">3 days ago</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .design-book-dashboard {
+        min-height: 100vh;
+        background: linear-gradient(135deg, var(--wp--preset--color--primary) 0%, var(--wp--preset--color--secondary) 100%);
+        padding: 2rem 0;
+        font-family: var(--wp--preset--font-family--inter);
+    }
+    
+    .dashboard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+    
+    .dashboard-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        color: white;
+    }
+    
+    .dashboard-title {
+        font-size: var(--wp--preset--font-size--x-large);
+        font-weight: 700;
+        margin: 0 0 0.5rem 0;
+        font-family: var(--wp--preset--font-family--playfair-display);
+    }
+    
+    .dashboard-subtitle {
+        font-size: var(--wp--preset--font-size--medium);
+        opacity: 0.9;
+        margin: 0;
+    }
+    
+    .navigation-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+    
+    .nav-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        text-decoration: none;
+        color: var(--wp--preset--color--base-darkest);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        border: 1px solid var(--wp--preset--color--base-lightest);
+    }
+    
+    .nav-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        color: var(--wp--preset--color--primary-dark);
+        text-decoration: none;
+    }
+    
+    .nav-card-icon {
+        font-size: 2.5rem;
+        color: var(--wp--preset--color--primary);
+        margin-bottom: 1rem;
+        display: block;
+    }
+    
+    .nav-card-title {
+        font-size: var(--wp--preset--font-size--large);
+        font-weight: 600;
+        margin: 0 0 0.5rem 0;
+        font-family: var(--wp--preset--font-family--inter);
+    }
+    
+    .nav-card-description {
+        font-size: var(--wp--preset--font-size--small);
+        color: var(--wp--preset--color--base);
+        margin: 0;
+        line-height: 1.5;
+    }
+    
+    .dashboard-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+    
+    .stat-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--wp--preset--color--base-lightest);
+    }
+    
+    .stat-number {
+        font-size: var(--wp--preset--font-size--x-large);
+        font-weight: 700;
+        color: var(--wp--preset--color--primary-dark);
+        margin: 0 0 0.5rem 0;
+        font-family: var(--wp--preset--font-family--inter);
+    }
+    
+    .stat-label {
+        font-size: var(--wp--preset--font-size--small);
+        color: var(--wp--preset--color--base);
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .recent-activity {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 12px;
+        padding: 2rem;
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--wp--preset--color--base-lightest);
+    }
+    
+    .activity-header {
+        font-size: var(--wp--preset--font-size--large);
+        font-weight: 600;
+        margin: 0 0 1.5rem 0;
+        color: var(--wp--preset--color--base-darkest);
+        font-family: var(--wp--preset--font-family--inter);
+    }
+    
+    .activity-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--wp--preset--color--base-lightest);
+    }
+    
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+    
+    .activity-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--wp--preset--color--primary-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        font-size: 0.875rem;
+        color: var(--wp--preset--color--primary-dark);
+    }
+    
+    .activity-content {
+        flex: 1;
+    }
+    
+    .activity-title {
+        font-size: var(--wp--preset--font-size--small);
+        font-weight: 500;
+        margin: 0 0 0.25rem 0;
+        color: var(--wp--preset--color--base-darkest);
+    }
+    
+    .activity-time {
+        font-size: var(--wp--preset--font-size--small);
+        color: var(--wp--preset--color--base);
+        margin: 0;
+    }
+    
+    @media (max-width: 768px) {
+        .dashboard-container {
+            padding: 0 1rem;
+        }
+        
+        .navigation-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .dashboard-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+</style>
+{% endblock %}

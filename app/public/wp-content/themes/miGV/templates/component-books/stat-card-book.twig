@@ -1,0 +1,251 @@
+{#
+  Stat Card Book Component - Statistics Display Card
+  
+  This component displays statistical information with numbers, labels, and optional trends.
+  Used in dashboards for showing metrics like property counts, ticket stats, etc.
+  
+  Usage:
+  {% include 'component-books/stat-card-book.twig' with {
+    variant: 'default',
+    value: '24',
+    label: 'Active Properties',
+    icon: 'home',
+    trend: {
+      direction: 'up',
+      value: '12%',
+      label: 'from last month'
+    },
+    color: 'primary',
+    href: '/properties',
+    class: 'additional-classes'
+  } %}
+  
+  Available variants:
+  - default: Standard stat card
+  - compact: Smaller stat card
+  - horizontal: Side-by-side layout
+  - featured: Larger with background color
+#}
+
+{% set stat_variants = {
+  default: {
+    padding: 'xl',
+    value_size: 'xx-large',
+    label_size: 'medium',
+    class: 'stat-card-default'
+  },
+  compact: {
+    padding: 'md',
+    value_size: 'x-large',
+    label_size: 'small',
+    class: 'stat-card-compact'
+  },
+  horizontal: {
+    padding: 'lg',
+    value_size: 'x-large',
+    label_size: 'medium',
+    layout: 'horizontal',
+    class: 'stat-card-horizontal'
+  },
+  featured: {
+    padding: '2xl',
+    value_size: 'huge',
+    label_size: 'large',
+    has_background: true,
+    class: 'stat-card-featured'
+  }
+} %}
+
+{# Color schemes for different stat types #}
+{% set color_schemes = {
+  primary: {
+    text: 'primary',
+    background: 'primary-light',
+    icon: 'primary-dark'
+  },
+  secondary: {
+    text: 'secondary',
+    background: 'secondary-light',
+    icon: 'secondary-dark'
+  },
+  success: {
+    text: 'primary',
+    background: 'primary-light',
+    icon: 'primary-dark'
+  },
+  warning: {
+    text: 'neutral-dark',
+    background: 'neutral-light',
+    icon: 'neutral'
+  },
+  danger: {
+    text: 'secondary-dark',
+    background: 'secondary-light',
+    icon: 'secondary'
+  }
+} %}
+
+{# Get configurations #}
+{% set config = stat_variants[variant] ?? stat_variants.default %}
+{% set color_scheme = color_schemes[color] ?? color_schemes.primary %}
+{% set element_tag = href ? 'a' : 'div' %}
+{% set element_class = ['villa-stat-card', config.class, class]|join(' ')|trim %}
+
+{# Render the stat card #}
+<{{ element_tag }}{% if href %} href="{{ href }}"{% endif %} class="{{ element_class }}" style="
+  {%- include 'primitive-books/color-book.twig' with {
+    background_color: config.has_background ? color_scheme.background : 'extreme-light',
+    border_color: 'base-light'
+  } -%}
+  {%- include 'primitive-books/border-book.twig' with {
+    border_width: 'thin',
+    border_style: 'solid',
+    border_radius: 'lg'
+  } -%}
+  {%- include 'primitive-books/shadow-book.twig' with {
+    box_shadow: 'sm'
+  } -%}
+  {%- include 'primitive-books/spacing-book.twig' with {
+    padding: config.padding
+  } -%}
+  {%- include 'primitive-books/animation-book.twig' with {
+    transition_property: 'all',
+    transition_duration: 'base',
+    transition_timing: 'ease'
+  } -%}
+  {% if config.layout == 'horizontal' %}
+    {%- include 'primitive-books/layout-book.twig' with {
+      display: 'flex',
+      align_items: 'center',
+      justify_content: 'between',
+      gap: 'lg'
+    } -%}
+  {% else %}
+    {%- include 'primitive-books/layout-book.twig' with {
+      display: 'flex',
+      flex_direction: 'col',
+      align_items: 'start'
+    } -%}
+  {% endif %}
+  {% if href %}
+    text-decoration: none;
+    cursor: pointer;
+  {% endif %}
+  position: relative;
+  overflow: hidden;
+"
+{% if href %}
+  onmouseover="this.style.boxShadow='var(--wp--custom--layout--shadows--md)'; this.style.transform='translateY(-2px)';"
+  onmouseout="this.style.boxShadow='var(--wp--custom--layout--shadows--sm)'; this.style.transform='translateY(0)';"
+{% endif %}>
+  
+  <div class="stat-card__main" style="
+    {% if config.layout == 'horizontal' %}
+      flex-grow: 1;
+    {% endif %}
+  ">
+    {% if icon %}
+      <div class="stat-card__icon" style="
+        {%- include 'primitive-books/color-book.twig' with {
+          color: color_scheme.icon
+        } -%}
+        {%- include 'primitive-books/spacing-book.twig' with {
+          margin_bottom: 'md'
+        } -%}
+        font-size: 1.5rem;
+      ">
+        {# Icon would be rendered here #}
+        {{ icon }}
+      </div>
+    {% endif %}
+    
+    <div class="stat-card__value" style="
+      {%- include 'primitive-books/typography-book.twig' with {
+        font_family: 'playfair-display',
+        font_size: config.value_size,
+        font_weight: 'bold',
+        line_height: 'tight'
+      } -%}
+      {%- include 'primitive-books/color-book.twig' with {
+        color: color_scheme.text
+      } -%}
+      {%- include 'primitive-books/spacing-book.twig' with {
+        margin_bottom: 'sm'
+      } -%}
+    ">{{ value }}</div>
+    
+    <div class="stat-card__label" style="
+      {%- include 'primitive-books/typography-book.twig' with {
+        font_family: 'inter',
+        font_size: config.label_size,
+        font_weight: 'medium',
+        line_height: 'normal'
+      } -%}
+      {%- include 'primitive-books/color-book.twig' with {
+        color: 'base-dark'
+      } -%}
+    ">{{ label }}</div>
+  </div>
+  
+  {% if trend %}
+    <div class="stat-card__trend" style="
+      {%- include 'primitive-books/layout-book.twig' with {
+        display: 'flex',
+        align_items: 'center',
+        gap: 'xs'
+      } -%}
+      {%- include 'primitive-books/spacing-book.twig' with {
+        margin_top: config.layout == 'horizontal' ? '0' : 'md'
+      } -%}
+    ">
+      <span class="trend-indicator" style="
+        {%- include 'primitive-books/typography-book.twig' with {
+          font_size: config.label_size,
+          font_weight: 'semiBold'
+        } -%}
+        {%- include 'primitive-books/color-book.twig' with {
+          color: trend.direction == 'up' ? 'primary' : (trend.direction == 'down' ? 'secondary-dark' : 'base')
+        } -%}
+      ">
+        {% if trend.direction == 'up' %}
+          ↑
+        {% elseif trend.direction == 'down' %}
+          ↓
+        {% else %}
+          →
+        {% endif %}
+        {{ trend.value }}
+      </span>
+      
+      {% if trend.label %}
+        <span class="trend-label" style="
+          {%- include 'primitive-books/typography-book.twig' with {
+            font_size: 'small',
+            font_weight: 'regular'
+          } -%}
+          {%- include 'primitive-books/color-book.twig' with {
+            color: 'base'
+          } -%}
+        ">{{ trend.label }}</span>
+      {% endif %}
+    </div>
+  {% endif %}
+  
+  {% if config.has_background %}
+    <div class="stat-card__decoration" style="
+      position: absolute;
+      top: -20%;
+      right: -10%;
+      width: 40%;
+      height: 140%;
+      {%- include 'primitive-books/color-book.twig' with {
+        background_color: color_scheme.background
+      } -%}
+      opacity: 0.5;
+      transform: rotate(15deg);
+      {%- include 'primitive-books/border-book.twig' with {
+        border_radius: '3xl'
+      } -%}
+    "></div>
+  {% endif %}
+</{{ element_tag }}>
